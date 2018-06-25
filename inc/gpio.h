@@ -85,7 +85,7 @@ typedef struct
     uint8_t pin;        // GPIO Pin (1 - 15)
     uint8_t mode;       // Pin Mode (Input, Output, Alternate, Analog)
     uint8_t otype;      // Pin Output Type (Push-Pull, Open-Drain)
-    uint8_t ospeed;     // Pin Output Speed (Slow, Medium, Fast, Very Fast)
+    uint8_t ospeed;     // Pin Output Speed (Slow, Medium, High, Very High)
     uint8_t pull;       // Pin Pull Direction (None, Up, Down)
     uint8_t function;   // Pin alternate function - valid only in Alternate mode
     GPIO_TypeDef *base; // Configured by driver during initialization

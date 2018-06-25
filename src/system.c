@@ -66,4 +66,38 @@ void SystemInit (void)
     RCC->CFGR &= ~RCC_CFGR_MCOSEL;
     RCC->CFGR |= RCC_CFGR_MCOSEL_SYSCLK;
 #endif // MCO_OUTPUT
+
+    // Configure timers used for us and ms delay
+    RCC->APB1ENR |= RCC_APB1ENR_TIM7EN;
+    RCC->APB1ENR |= RCC_APB1ENR_TIM6EN;
+    TIM6->PSC = 31;
+    TIM7->PSC = 31999;
+}
+
+void delay_us(uint16_t us)
+{
+    // Ensure update interrupt flag is cleared
+    TIM6->SR &= ~TIM_SR_UIF;
+    // Set time auto-reload register
+    TIM6->ARR = us;
+    // Enable timer
+    TIM6->CR1 |= TIM_CR1_CEN;
+    // Block until update interrupt flag is set
+    while (! (TIM6->SR & TIM_SR_UIF));
+    // Disable timer
+    TIM6->CR1 &= ~TIM_CR1_CEN;
+}
+
+void delay_ms(uint16_t ms)
+{
+    // Ensure update interrupt flag is cleared
+    TIM7->SR &= ~TIM_SR_UIF;
+    // Set time auto-reload register
+    TIM7->ARR = ms;
+    // Enable timer
+    TIM7->CR1 |= TIM_CR1_CEN;
+    // Block until update interrupt flag is set
+    while (! (TIM7->SR & TIM_SR_UIF));
+    // Disable timer
+    TIM7->CR1 &= ~TIM_CR1_CEN;
 }

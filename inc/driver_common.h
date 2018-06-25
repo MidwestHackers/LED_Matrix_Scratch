@@ -1,6 +1,8 @@
 #ifndef __DRIVER_COMMON_H__
 #define __DRIVER_COMMON_H__
 
+#include "stdint.h"
+
 typedef enum
 {
     // Generic Return Values
