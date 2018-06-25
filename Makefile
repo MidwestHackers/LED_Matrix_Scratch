@@ -6,7 +6,8 @@ OPT = -Og
 BUILD_DIR = build
 
 C_SOURCES = src/main.c \
-            src/gpio.c
+            src/gpio.c \
+            src/system.c
 
 ASM_SOURCES = startup_stm32l151xe.s
 
@@ -17,8 +18,11 @@ AS = $(BINPATH)/$(PREFIX)gcc -x assembler-with-cpp
 CP = $(BINPATH)/$(PREFIX)objcopy
 AR = $(BINPATH)/$(PREFIX)ar
 SZ = $(BINPATH)/$(PREFIX)size
+GDB = $(BINPATH)/$(PREFIX)gdb
 HEX = $(CP) -O ihex
 BIN = $(CP) -O binary -S
+
+ATTACH_OPENOCD = attach.cfg
  
 CPU = -mcpu=cortex-m3
 MCU = $(CPU) -mthumb $(FPU) $(FLOAT-ABI)
@@ -36,7 +40,7 @@ ifeq ($(DEBUG), 1)
 CFLAGS += -g -gdwarf-2
 endif
 
-CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)"
+CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@:%.o=%.d)" -DPLATFORM_NUCLEO_L152RE -DMCO_OUTPUT
 
 LDSCRIPT = STM32L151RETx_FLASH.ld
 
@@ -46,6 +50,8 @@ LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BU
 
 all: $(BUILD_DIR)/$(TARGET).bin
 
+debug: $(BUILD_DIR)/$(TARGET).elf
+	$(GDB) $(BUILD_DIR)/$(TARGET).elf -x $(ATTACH_OPENOCD)
 
 OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.o)))
 vpath %.c $(sort $(dir $(C_SOURCES)))
@@ -66,10 +72,10 @@ $(BUILD_DIR)/%.hex: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
 	$(HEX) $< $@
 	
 $(BUILD_DIR)/%.bin: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
-	$(BIN) $< $@	
-	
+	$(BIN) $< $@
+
 $(BUILD_DIR):
-	mkdir $@		
+	mkdir $@
 
 clean:
 	-rm -fR .dep $(BUILD_DIR)

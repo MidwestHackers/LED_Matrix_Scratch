@@ -1,9 +1,4 @@
-#include "stm32l151xe.h"
-#include "platform_nucleo_l152re.h"
-
-void SystemInit (void)
-{
-}
+#include "platforms.h"
 
 int main (void)
 {
